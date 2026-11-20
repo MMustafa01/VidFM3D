@@ -17,7 +17,7 @@ from vidfm3d.dust3r.datasets.base.batched_sampler import BatchedRandomSampler
 
 class EasyDataset:
     """a dataset that you can easily resize and combine.
-    Examples:
+    Examples: 
     ---------
         2 * dataset ==> duplicate each element 2x
 
