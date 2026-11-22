@@ -47,3 +47,9 @@ demo_outputs/
 # Checkpoints
 **tar
 **ckpt
+
+
+# experiment outputs
+wandb/
+*.sft
+*.out
