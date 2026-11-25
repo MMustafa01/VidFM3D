@@ -4,7 +4,7 @@
 #
 # 1) The whole CO3Dv2 single-sequence subset (8.65 GB, 88 videos, 48 categories) with the
 #    OFFICIAL downloader (it verifies SHA256 checksums). It goes to the login node's local /tmp.
-# 2) Only images/ + masks/ of the categories in CATS are copied to /home,
+# 2) Only images/ + masks/ of all 88 videos (~2.1 GB) are copied to /home,
 #    because that's all extract_frames.py reads.
 # 3) Model weights: VGGT-1B (only model.safetensors: the repo also has a second 5 GB
 #    copy, model.pt) and DINOv2-small.
@@ -24,9 +24,8 @@ TMP_ROOT=${TMP_ROOT:-/tmp/$USER}
 CO3D_REPO=$TMP_ROOT/co3d_repo                 # official code (download script + link list)
 DL=$TMP_ROOT/co3d_dl                          # the full subset, unpacked
 
-# Categories copied to /home: 8 categories x 3 videos = 24 videos, 15 pass extract_frames.py's filter.
-# All 28 passing videos (of 88) need ~25 GB on /home in total (env, weights, targets, features).
-CATS=(apple bench toytruck toytrain skateboard remote ball broccoli)
+# All 88 videos are copied; extract_frames.py (job 03) should accept 28 of them, in 17 categories.
+# Expected total on /home at the end: ~25 GB (env, weights, targets, features).
 
 mkdir -p "$RAW" "$DL"
 # the repo expects vidfm3d/data/CO3D; point it at the real data location
@@ -54,12 +53,9 @@ else
 fi
 du -sh "$DL"
 
-# ---------- 2) copy only images + masks of CATS to /home ----------
-for c in "${CATS[@]}"; do
-    rsync -am --include='*/' --include='/*/*/images/*' --include='/*/*/masks/*' --exclude='*' \
-        "$DL/$c" "$RAW/"
-    echo "   $c: $(find "$RAW/$c" -mindepth 1 -maxdepth 1 -type d | wc -l) videos"
-done
+# ---------- 2) copy only images + masks to /home ----------
+rsync -am --include='*/' --include='/*/*/images/*' --include='/*/*/masks/*' --exclude='*' "$DL/" "$RAW/"
+echo "== $(find "$RAW" -mindepth 2 -maxdepth 2 -type d | wc -l) videos in $(find "$RAW" -mindepth 1 -maxdepth 1 -type d | wc -l) categories (expected: 88 in 48)"
 du -sh "$RAW"
 
 # ---------- 3) model weights ----------

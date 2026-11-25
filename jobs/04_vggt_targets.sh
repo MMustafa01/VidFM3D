@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --partition=A100devel
 #SBATCH --job-name=04_vggt_targets
-#SBATCH --time=0:45:00
+#SBATCH --time=1:00:00                 # the A100devel maximum; finished videos are skipped, so just resubmit if it runs out
 #SBATCH --gpus=1
 #SBATCH --cpus-per-task=4
 #SBATCH --output=logs/slurm/%x-%j.out
