@@ -18,6 +18,7 @@ export HF_HUB_OFFLINE=1                      # never download inside a job: fail
 export WANDB_MODE=offline
 
 echo "== job ${SLURM_JOB_ID:-local} '${SLURM_JOB_NAME:-}' on $(hostname) at $(date)"
-echo "== code: $(git log -1 --oneline)"
+# compute nodes have no git, so fall back to reading the commit hash from .git
+echo "== code: $(git log -1 --oneline 2>/dev/null || cut -c1-7 ".git/$(sed 's/^ref: //' .git/HEAD)")"
 echo "== free on /home: $(df -h ~ | awk 'NR==2{print $4}')"
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader 2>/dev/null || echo "== no GPU"

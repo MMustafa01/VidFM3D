@@ -17,7 +17,7 @@ def timed_matmul(device: str, n: int = 4096, reps: int = 10, dtype=torch.float32
         torch.cuda.synchronize()            # without this you'd time only the *launch*, not the work
     dt = (time.perf_counter() - t0) / reps
     tflops = 2 * n**3 / dt / 1e12           # an n×n matmul is ~2n³ floating-point ops
-    print(f"  {device:4s} {str(dtype):15s} {dt * 1e3:8.2f} ms/matmul  {tflops:6.1f} TFLOP/s")
+    print(f"  {device:4s} {str(dtype):15s} n={n} {dt * 1e3:8.2f} ms/matmul  {tflops:6.1f} TFLOP/s")
     return dt
 
 
@@ -31,7 +31,7 @@ def main() -> None:
     print(f"device: {props.name} | {props.total_memory / 1e9:.0f} GB | "
           f"compute capability {props.major}.{props.minor} | bf16: {torch.cuda.is_bf16_supported()}")
 
-    print("matmul 4096×4096:")
+    print("n×n matmul (compare TFLOP/s: the CPU uses a smaller n):")
     timed_matmul("cpu", n=2048, reps=2)     # smaller on CPU, it's slow
     timed_matmul("cuda")
     torch.backends.cuda.matmul.allow_tf32 = True   # A100 tensor cores for fp32 matmuls (slightly less precise)

@@ -1,11 +1,10 @@
 #!/bin/bash
-#SBATCH --partition=A100devel
+#SBATCH --partition=A40devel
 #SBATCH --job-name=03_extract_frames
 #SBATCH --time=0:30:00
-#SBATCH --gpus=1
 #SBATCH --cpus-per-task=6               # extract_frames.py uses a pool of 6 processes
 #SBATCH --output=logs/slurm/%x-%j.out
-# CPU-only work; --gpus=1 only because the partition may require it (check `sinfo -s` for a CPU partition).
+# CPU-only work (OpenCV + NumPy), so no GPU is requested. Bender has no CPU partition, but A40devel accepts jobs without one.
 source jobs/common.sh
 
 python -m vidfm3d.data.processing.co3d.extract_frames \
