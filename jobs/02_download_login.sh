@@ -5,7 +5,7 @@
 # 1) The whole CO3Dv2 single-sequence subset (8.65 GB, 88 videos, 48 categories) with the
 #    OFFICIAL downloader (it verifies SHA256 checksums). It goes to the login node's local /tmp.
 # 2) Only images/ + masks/ of the categories in CATS are copied to /home,
-#    because that's all extract_frames.py reads and /home is nearly full.
+#    because that's all extract_frames.py reads.
 # 3) Model weights: VGGT-1B (only model.safetensors: the repo also has a second 5 GB
 #    copy, model.pt) and DINOv2-small.
 #
@@ -18,19 +18,20 @@ eval "$(conda shell.bash hook)"
 conda activate vidfm3d                        # the downloader needs requests + tqdm
 set -u
 
-DATA_DIR=$HOME/cv_lab/data
+DATA_DIR=$(dirname "$(pwd -P)")/data         # next to the repo: ~/dev/cv_lab/data
 RAW=$DATA_DIR/CO3D/CO3D-data
 TMP_ROOT=${TMP_ROOT:-/tmp/$USER}
 CO3D_REPO=$TMP_ROOT/co3d_repo                 # official code (download script + link list)
 DL=$TMP_ROOT/co3d_dl                          # the full subset, unpacked
 
 # Categories copied to /home: 8 categories x 3 videos = 24 videos, 15 pass extract_frames.py's filter.
-# All 28 passing videos (of 88) would need ~25 GB on /home once targets + features are added.
+# All 28 passing videos (of 88) need ~25 GB on /home in total (env, weights, targets, features).
 CATS=(apple bench toytruck toytrain skateboard remote ball broccoli)
 
 mkdir -p "$RAW" "$DL"
 # the repo expects vidfm3d/data/CO3D; point it at the real data location
-[ -L vidfm3d/data/CO3D ] || ln -s "$DATA_DIR/CO3D" vidfm3d/data/CO3D
+# (-f -n: replace an old link, so re-running fixes it if the folder was moved)
+ln -sfn "$DATA_DIR/CO3D" vidfm3d/data/CO3D
 
 # ---------- 1) official download to /tmp ----------
 if [ -f "$DL/.done" ]; then

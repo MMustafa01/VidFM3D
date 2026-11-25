@@ -1,7 +1,7 @@
 # Shared setup for every job script. Usage (first line after the #SBATCH block):
 #   source jobs/common.sh
 # SLURM starts jobs in the directory you ran `sbatch` from, so always submit
-# from the repo root:  cd ~/cv_lab/VidFM3D && sbatch jobs/<script>.sh
+# from the repo root:  cd ~/dev/cv_lab/VidFM3D && sbatch jobs/<script>.sh
 
 set -eo pipefail          # stop on the first error / failed pipe
                           # (no `set -u` yet: conda's activate scripts use unset variables)
@@ -12,7 +12,7 @@ eval "$(conda shell.bash hook)"
 conda activate vidfm3d
 set -u                    # from here on, using an unset variable is an error
 
-export DATA_DIR=$HOME/cv_lab/data            # real location of all data (symlinked into the repo)
+export DATA_DIR=$(dirname "$(pwd -P)")/data    # next to the repo: ~/dev/cv_lab/data (symlinked into the repo)
 export HF_HOME=$DATA_DIR/hf_cache            # model weights, pre-downloaded on the login node
 export HF_HUB_OFFLINE=1                      # never download inside a job: fail fast if not cached
 export WANDB_MODE=offline
