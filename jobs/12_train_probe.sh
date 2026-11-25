@@ -33,6 +33,12 @@ case $MODEL in
     *)    echo "unknown model '$MODEL' (use dino or wan)"; exit 1 ;;
 esac
 
+# The paper's config uses batch size 10, which needs more than the A40's 48 GB. Two batches of 5 whose gradients
+# are added up before each update use much less memory and train on (almost) the same 10 samples per step.
+# On an A100 (80 GB) the original can be tried: add  data.data_module.batch_size_per_device=10 ++trainer.accumulate_grad_batches=1
+BATCH=5
+ACCUMULATE=2
+
 WARMUP=$(( (EPOCHS * 10 + 74) / 75 ))    # same share of warmup as the paper's config (10 of 75 epochs), at least 1
 
 ARGS=(
@@ -42,6 +48,11 @@ ARGS=(
     trainer.devices=1
     trainer.max_epochs=$EPOCHS
     model.scheduler.warmup_epochs=$WARMUP
+    data.data_module.batch_size_per_device=$BATCH
+    data.data_module.batch_size_per_device_val=$BATCH
+    ++trainer.accumulate_grad_batches=$ACCUMULATE
+    # one checkpoint is ~4.6 GB (382 M parameters + optimizer), so keep only the last one, which is what we test
+    callbacks.model_checkpoint.save_top_k=0
     data.data_module.num_workers=8
     data.data_module.num_workers_val=2
     # 26 videos with batch size 10 are only 2 steps per epoch. "N * dataset" (built into the repo) goes through
