@@ -1,0 +1,38 @@
+# Lean subset of requirements.txt: only what the pre-tasks import
+# (CO3D processing, VGGT targets, DINO features, probe training/eval).
+# Dropped (not imported on this path): deepspeed, open3d, gradio, diffusers,
+# viser, plotly, seaborn, pyglet, torchinfo, scikit-image, pillow_heif,
+# hydra-optuna-sweeper. Install torch/torchvision BEFORE this file.
+# pytorch3d is built separately (needs nvcc), see PRETASKS_PLAN Task 2.
+
+# --------- lightning --------- #
+lightning>=2.5.0
+lightning-bolts
+lightning-utilities
+torchmetrics
+
+# --------- hydra --------- #
+hydra-core
+hydra-colorlog
+
+# --------- loggers --------- #
+wandb
+
+# --------- others --------- #
+rootutils
+rich
+
+# --------- project core --------- #
+trimesh
+roma
+einops
+transformers>=4.45,<5   # 5.x needs torch>=2.6, we install 2.5.1
+jaxtyping
+typeguard               # imported by vidfm3d/utils/typing.py, missing from requirements.txt
+opencv-python-headless
+matplotlib
+tqdm
+scipy
+scikit-learn
+safetensors
+huggingface-hub[torch]>=0.22
