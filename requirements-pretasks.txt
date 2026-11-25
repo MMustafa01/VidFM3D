@@ -3,6 +3,11 @@
 # pytorch3d is built separately (needs nvcc), see PRETASKS_PLAN Task 2.
 -r requirements.txt
 
+# guard: if a package wants a newer torch, pip must stop instead of silently replacing it
+torch==2.5.1
+torchvision==0.20.1
+
 setuptools<81           # lightning-bolts -> pytorch-lightning 1.9 imports pkg_resources, removed in setuptools 82
 transformers>=4.45,<5   # 5.x needs torch>=2.6, we install 2.5.1
+accelerate<1.16         # diffusers needs it to load WAN, missing from requirements.txt; 1.16 needs torch>=2.6
 typeguard               # imported by vidfm3d/utils/typing.py, missing from requirements.txt
